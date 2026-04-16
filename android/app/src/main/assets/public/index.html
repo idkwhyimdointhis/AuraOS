@@ -1,0 +1,924 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Athlete OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#080808;--surface:#111;--surface2:#181818;--surface3:#1e1e1e;
+  --border:#252525;--border2:#333;
+  --green:#00e676;--green-dim:rgba(0,230,118,.10);--green-glow:rgba(0,230,118,.22);
+  --text:#efefef;--text-dim:#888;--text-muted:#3a3a3a;
+  --red:#ff4444;--amber:#ffb300;--blue:#4fc3f7;--purple:#ce93d8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+header{padding:22px 24px 0;display:flex;align-items:center;gap:10px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--green);text-shadow:0 0 18px var(--green-glow);}
+.logo span{color:var(--text);}
+nav{display:flex;gap:4px;padding:16px 24px 0;overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.nav-btn:hover{color:var(--text);border-color:var(--border2);}
+.nav-btn.active{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+.nav-btn.cal-tab{border-color:var(--amber);color:var(--amber);}
+.nav-btn.cal-tab.active{background:rgba(255,179,0,.10);border-color:var(--amber);color:var(--amber);}
+main{padding:24px;max-width:720px;margin:0 auto;}
+.tab{display:none;}
+.tab.active{display:block;animation:fadeUp .28s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;margin-bottom:2px;}
+.sec-sub{font-size:12px;color:var(--text-dim);margin-bottom:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+textarea,input[type=text],input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;transition:border-color .18s,box-shadow .18s;resize:none;}
+textarea:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-dim);}
+label{display:block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px;}
+.field{margin-bottom:14px;}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#000;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:10px 18px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.btn:hover{background:#00ff88;transform:translateY(-1px);box-shadow:0 4px 18px var(--green-glow);}
+.btn:active{transform:translateY(0);}
+.btn-sm{padding:7px 13px;font-size:12px;}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.tag{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer;transition:all .14s;user-select:none;}
+.tag.selected{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+/* journal */
+.j-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:14px;}
+.j-prompt{background:var(--surface2);border-left:2px solid var(--green);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--text-dim);font-style:italic;}
+.mood-row{display:flex;gap:8px;margin-bottom:14px;}
+.mood-opt{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 4px;text-align:center;cursor:pointer;font-size:20px;transition:all .14s;user-select:none;}
+.mood-opt.sel{border-color:var(--green);background:var(--green-dim);}
+.j-entries{margin-top:24px;}
+.j-entry{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:11px;position:relative;}
+.j-entry-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:7px;}
+.j-entry-mood{position:absolute;top:13px;right:13px;font-size:17px;}
+.j-entry-text{font-size:13px;color:var(--text-dim);line-height:1.6;}
+/* habits */
+.habit-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.habit-row:last-of-type{border-bottom:none;}
+.habit-name{font-size:14px;font-weight:500;}
+.habit-streak{font-size:10px;color:var(--text-dim);margin-top:2px;font-family:'DM Mono',monospace;}
+.habit-actions{display:flex;align-items:center;gap:10px;}
+.check-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .18s;flex-shrink:0;}
+.check-btn.done{background:var(--green);border-color:var(--green);color:#000;box-shadow:0 0 10px var(--green-glow);}
+.add-row{display:flex;gap:8px;margin-top:14px;}
+.prog-wrap{background:var(--surface2);border-radius:4px;height:3px;margin-top:18px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--green);border-radius:4px;transition:width .5s ease;box-shadow:0 0 6px var(--green-glow);}
+.prog-label{font-size:10px;color:var(--text-dim);margin-top:7px;font-family:'DM Mono',monospace;}
+/* workout */
+.drill-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+.drill-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.drill-text{font-size:13px;}
+.drill-detail{font-size:10px;color:var(--text-dim);margin-top:2px;font-family:'DM Mono',monospace;}
+.rm-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;line-height:1;transition:color .15s;padding:0 2px;}
+.rm-btn:hover{color:var(--red);}
+.add-drill-row{display:flex;gap:8px;}
+.add-drill-row input:first-child{flex:1.5;}
+.add-drill-row input:nth-child(2){flex:1;}
+.sessions{margin-top:24px;}
+.s-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:11px;}
+.s-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.s-title{font-size:14px;font-weight:600;}
+.s-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;letter-spacing:.5px;}
+.badge-fb{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
+.badge-gym{background:rgba(79,195,247,.10);color:var(--blue);border:1px solid var(--blue);}
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--text-dim);}
+.s-notes{margin-top:9px;font-size:12px;color:var(--text-dim);}
+/* calories */
+.cal-total-box{text-align:center;padding:22px;background:var(--surface2);border-radius:12px;margin-bottom:18px;}
+.cal-num{font-family:'Bebas Neue',sans-serif;font-size:68px;color:var(--green);text-shadow:0 0 28px var(--green-glow);line-height:1;}
+.cal-lbl{font-size:11px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.food-add-row{display:flex;gap:8px;margin-bottom:14px;}
+.food-add-row input:first-child{flex:2;}
+.food-add-row input:nth-child(2){flex:1;}
+.food-list{display:flex;flex-direction:column;gap:7px;}
+.food-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;}
+.food-name-txt{font-size:13px;}
+.food-right{display:flex;align-items:center;gap:10px;}
+.food-cal-txt{font-family:'DM Mono',monospace;font-size:13px;color:var(--green);}
+.reset-note{font-size:10px;color:var(--text-muted);text-align:center;margin-top:14px;font-family:'DM Mono',monospace;}
+/* calendar */
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.month-lbl{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;}
+.mnav-btns{display:flex;gap:6px;}
+.mnav-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:14px;transition:all .14s;}
+.mnav-btn:hover{border-color:var(--border2);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:20px;}
+.cal-dl{text-align:center;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding:7px 0;}
+.cal-day{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;position:relative;border:1px solid transparent;}
+.cal-day.today{border-color:var(--green);color:var(--green);font-weight:700;}
+.cal-day.other{color:#2a2a2a;}
+.day-num{line-height:1;}
+.day-dots{display:flex;gap:2px;margin-top:2px;}
+.dot{width:4px;height:4px;border-radius:50%;}
+.dot-fb{background:var(--green);}
+.dot-gym{background:var(--blue);}
+.cal-legend{display:flex;gap:16px;margin-bottom:28px;font-size:11px;color:var(--text-dim);align-items:center;}
+.cal-legend span{display:flex;align-items:center;gap:5px;}
+/* charts */
+.charts-section{margin-top:8px;}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.chart-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;}
+.chart-wrap{position:relative;width:100%;}
+canvas{display:block;width:100%!important;}
+.chart-stat{text-align:center;margin-top:10px;}
+.chart-stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);}
+.chart-stat-lbl{font-size:10px;color:var(--text-dim);}
+/* misc */
+.empty{text-align:center;padding:36px 20px;color:var(--text-muted);}
+.empty-ico{font-size:28px;margin-bottom:8px;}
+.empty-txt{font-size:12px;}
+.del-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;padding:0;transition:color .15s;line-height:1;}
+.del-btn:hover{color:var(--red);}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--green);color:#000;font-size:12px;font-weight:700;padding:9px 18px;border-radius:8px;transition:transform .28s ease;z-index:999;pointer-events:none;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:540px){.chart-row{grid-template-columns:1fr;}main{padding:14px;}nav{padding:12px 14px 0;}header{padding:16px 14px 0;}.cal-num{font-size:52px;}}
+</style>
+</head>
+<body>
+<header><div class="logo">ATHLETE<span>OS</span></div></header>
+<nav id="mainnav">
+  <button class="nav-btn active" data-tab="journal">📓 Journal</button>
+  <button class="nav-btn" data-tab="habits">✅ Habits</button>
+  <button class="nav-btn" data-tab="football">⚽ Football</button>
+  <button class="nav-btn" data-tab="gym">🏋️ Gym</button>
+  <button class="nav-btn" data-tab="calories">🔥 Calories</button>
+  <button class="nav-btn cal-tab" data-tab="calendar">📅 Calendar</button>
+</nav>
+<main>
+
+<!-- JOURNAL -->
+<div class="tab active" id="tab-journal">
+  <div class="sec-title">Journal</div>
+  <div class="sec-sub">Reflect like a pro.</div>
+  <div class="card">
+    <div class="j-date" id="jDate"></div>
+    <div class="j-prompt" id="jPrompt"></div>
+    <div class="field">
+      <label>Mood</label>
+      <div class="mood-row">
+        <div class="mood-opt sel" data-mood="😤">😤</div>
+        <div class="mood-opt" data-mood="😊">😊</div>
+        <div class="mood-opt" data-mood="😐">😐</div>
+        <div class="mood-opt" data-mood="😴">😴</div>
+        <div class="mood-opt" data-mood="😔">😔</div>
+      </div>
+    </div>
+    <div class="field"><label>Entry</label><textarea id="jText" rows="5" placeholder="Write freely..."></textarea></div>
+    <button class="btn" id="saveJournalBtn">Save Entry</button>
+  </div>
+  <div class="j-entries" id="jEntries"></div>
+</div>
+
+<!-- HABITS -->
+<div class="tab" id="tab-habits">
+  <div class="sec-title">Habits</div>
+  <div class="sec-sub">Daily consistency -- checks reset each day, streaks only break if you miss a day.</div>
+  <div class="card">
+    <div id="habitList"></div>
+    <div class="add-row">
+      <input type="text" id="habitInput" placeholder="New habit..." />
+      <button class="btn btn-sm" id="addHabitBtn">Add</button>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-label" id="progLabel">0 / 0 done today</div>
+  </div>
+</div>
+
+<!-- FOOTBALL -->
+<div class="tab" id="tab-football">
+  <div class="sec-title">Football</div>
+  <div class="sec-sub">Log your technical sessions.</div>
+  <div class="card">
+    <div class="field"><label>Session Title</label><input type="text" id="fbTitle" placeholder="e.g. Morning Technical" /></div>
+    <div class="field">
+      <label>Drills</label>
+      <div class="tags" id="fbPresets"></div>
+      <div class="add-drill-row" style="margin-top:8px;">
+        <input type="text" id="fbDrillName" placeholder="Custom drill..." />
+        <input type="text" id="fbDrillDetail" placeholder="Duration / Reps" />
+        <button class="btn btn-sm" id="addFbDrillBtn">+</button>
+      </div>
+    </div>
+    <div class="drill-list" id="fbDrillList"></div>
+    <div class="field" style="margin-top:8px;"><label>Notes</label><textarea id="fbNotes" rows="2" placeholder="Session notes..."></textarea></div>
+    <button class="btn" id="saveFbBtn">💾 Save Session</button>
+  </div>
+  <div class="sessions" id="fbSessions"></div>
+</div>
+
+<!-- GYM -->
+<div class="tab" id="tab-gym">
+  <div class="sec-title">Gym</div>
+  <div class="sec-sub">Track your gym work.</div>
+  <div class="card">
+    <div class="field"><label>Session Title</label><input type="text" id="gymTitle" placeholder="e.g. Legs and Core" /></div>
+    <div class="field">
+      <label>Exercises</label>
+      <div class="tags" id="gymPresets"></div>
+      <div class="add-drill-row" style="margin-top:8px;">
+        <input type="text" id="gymExName" placeholder="Custom exercise..." />
+        <input type="text" id="gymExDetail" placeholder="Sets x Reps / Weight" />
+        <button class="btn btn-sm" id="addGymExBtn">+</button>
+      </div>
+    </div>
+    <div class="drill-list" id="gymExList"></div>
+    <div class="field" style="margin-top:8px;"><label>Notes</label><textarea id="gymNotes" rows="2" placeholder="How did it feel..."></textarea></div>
+    <button class="btn" id="saveGymBtn">💾 Save Session</button>
+  </div>
+  <div class="sessions" id="gymSessions"></div>
+</div>
+
+<!-- CALORIES -->
+<div class="tab" id="tab-calories">
+  <div class="sec-title">Calories</div>
+  <div class="sec-sub">Resets every day -- history saved forever.</div>
+  <div class="cal-total-box">
+    <div class="cal-num" id="calTotal">0</div>
+    <div class="cal-lbl">kcal today</div>
+  </div>
+  <div class="card">
+    <div class="food-add-row">
+      <input type="text" id="foodName" placeholder="Food name..." />
+      <input type="number" id="foodCal" placeholder="kcal" min="0" />
+      <button class="btn" id="addFoodBtn">Add</button>
+    </div>
+    <div class="food-list" id="foodList"></div>
+  </div>
+  <p class="reset-note">🔄 Today's log resets at midnight -- past days stored in calendar</p>
+</div>
+
+<!-- CALENDAR -->
+<div class="tab" id="tab-calendar">
+  <div class="sec-title">Calendar</div>
+  <div class="sec-sub">Training overview &amp; charts.</div>
+  <div class="month-nav">
+    <div class="month-lbl" id="monthLbl"></div>
+    <div class="mnav-btns">
+      <button class="mnav-btn" id="prevMonthBtn">&#8249;</button>
+      <button class="mnav-btn" id="nextMonthBtn">&#8250;</button>
+    </div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="cal-legend">
+    <span><span class="dot dot-fb" style="width:8px;height:8px;display:inline-block;border-radius:50%;"></span> Football</span>
+    <span><span class="dot dot-gym" style="width:8px;height:8px;display:inline-block;border-radius:50%;"></span> Gym</span>
+  </div>
+  <!-- CHARTS -->
+  <div class="charts-section">
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title">Sessions this month</div>
+        <div class="chart-wrap"><canvas id="chartSessionsBar" height="160"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Training split</div>
+        <div class="chart-wrap"><canvas id="chartSplitDoughnut" height="160"></canvas></div>
+        <div class="chart-stat"><div class="chart-stat-num" id="splitTotal">0</div><div class="chart-stat-lbl">total sessions</div></div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title">Weekly sessions (last 8 weeks)</div>
+        <div class="chart-wrap"><canvas id="chartWeeklyLine" height="140"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Calories last 7 days</div>
+        <div class="chart-wrap"><canvas id="chartCalBar" height="140"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-row" style="grid-template-columns:1fr;">
+      <div class="chart-card">
+        <div class="chart-title">Habit completion rate -- last 14 days</div>
+        <div class="chart-wrap"><canvas id="chartHabitLine" height="120"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ══════════════════════════════════════════
+// LOCALSTORAGE DATABASE
+// Every piece of data is persisted immediately on change.
+// Keys: aos_journal, aos_habits, aos_habitsDay, aos_fbSessions,
+//       aos_gymSessions, aos_foods, aos_caloriesDay, aos_calHistory, aos_habitHistory
+// ══════════════════════════════════════════
+function dbGet(k,def){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v):def;}catch(e){return def;}}
+function dbSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+// ── STATE ──
+var S = {
+  journalEntries : dbGet('aos_journal',[]),
+  selectedMood   : '😤',
+  habits         : dbGet('aos_habits',[
+    {name:'Morning stretch',   done:false, streak:0, lastDone:''},
+    {name:'Watch 10min football', done:false, streak:0, lastDone:''},
+    {name:'Sleep 8 hours',     done:false, streak:0, lastDone:''}
+  ]),
+  habitsDay      : dbGet('aos_habitsDay',''),
+  habitHistory   : dbGet('aos_habitHistory',{}), // {dateISO: completionPct}
+  fbDrills       : [],
+  fbSessions     : dbGet('aos_fbSessions',[]),
+  gymExercises   : [],
+  gymSessions    : dbGet('aos_gymSessions',[]),
+  foods          : dbGet('aos_foods',[]),
+  caloriesDay    : dbGet('aos_caloriesDay',''),
+  calHistory     : dbGet('aos_calHistory',{}), // {dateISO: totalCal}
+  calY           : new Date().getFullYear(),
+  calM           : new Date().getMonth(),
+  charts         : {}
+};
+
+// ── SAVE HELPERS ──
+function saveJournal()     { dbSet('aos_journal', S.journalEntries); }
+function saveHabits()      { dbSet('aos_habits', S.habits); dbSet('aos_habitsDay', S.habitsDay); dbSet('aos_habitHistory', S.habitHistory); }
+function saveFb()          { dbSet('aos_fbSessions', S.fbSessions); }
+function saveGym()         { dbSet('aos_gymSessions', S.gymSessions); }
+function saveFoods()       { dbSet('aos_foods', S.foods); dbSet('aos_caloriesDay', S.caloriesDay); dbSet('aos_calHistory', S.calHistory); }
+
+// ── UTILS ──
+function pad(n){return n<10?'0'+n:''+n;}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function isoToDate(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function diffDays(a,b){return Math.round((isoToDate(b)-isoToDate(a))/(86400000));}
+
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2000);
+}
+
+// ── NAV ──
+document.querySelectorAll('.nav-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='calendar'){renderCalendar();renderCharts();}
+  });
+});
+
+// ══════════════════════════════════════════
+// JOURNAL
+// ══════════════════════════════════════════
+var PROMPTS=[
+  'What did you do well on the pitch today?',
+  'What is one area you want to sharpen next session?',
+  'How is your body feeling right now?',
+  'What is your mental state going into your next match?',
+  'What goal are you chasing this week?',
+  'Describe a moment today where you were completely locked in.',
+  'What would your future self thank you for doing today?',
+  'Who inspired you this week and why?',
+  'Rate your energy 1–10 and explain.',
+  'What does success look like for you this month?'
+];
+
+(function initJournal(){
+  var d=new Date();
+  document.getElementById('jDate').textContent=d.toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('jPrompt').textContent='💬 '+PROMPTS[d.getDate()%PROMPTS.length];
+  document.querySelectorAll('.mood-opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      document.querySelectorAll('.mood-opt').forEach(function(m){m.classList.remove('sel');});
+      el.classList.add('sel');
+      S.selectedMood=el.getAttribute('data-mood');
+    });
+  });
+  document.getElementById('saveJournalBtn').addEventListener('click',saveJournalEntry);
+  renderJournalEntries();
+})();
+
+function saveJournalEntry(){
+  var text=document.getElementById('jText').value.trim();
+  if(!text){toast('Write something first!');return;}
+  S.journalEntries.unshift({text:text,mood:S.selectedMood,date:new Date().toLocaleString('en-GB'),dateKey:todayISO()});
+  saveJournal();
+  document.getElementById('jText').value='';
+  renderJournalEntries();
+  toast('Entry saved!');
+}
+function deleteJournalEntry(i){S.journalEntries.splice(i,1);saveJournal();renderJournalEntries();}
+function renderJournalEntries(){
+  var el=document.getElementById('jEntries');
+  if(!S.journalEntries.length){el.innerHTML='<div class="empty"><div class="empty-ico">📓</div><div class="empty-txt">No entries yet.</div></div>';return;}
+  el.innerHTML=S.journalEntries.map(function(e,i){
+    return '<div class="j-entry">'+
+      '<div class="j-entry-date">'+e.date+'</div>'+
+      '<div class="j-entry-mood">'+e.mood+'</div>'+
+      '<div class="j-entry-text">'+e.text.replace(/\n/g,'<br>')+'</div>'+
+      '<button class="del-btn" style="margin-top:10px;" data-ji="'+i+'">✕ Remove</button>'+
+      '</div>';
+  }).join('');
+  el.querySelectorAll('.del-btn[data-ji]').forEach(function(btn){
+    btn.addEventListener('click',function(){deleteJournalEntry(parseInt(this.getAttribute('data-ji')));});
+  });
+}
+
+// ══════════════════════════════════════════
+// HABITS  -- streak only breaks if you miss a FULL day
+// ══════════════════════════════════════════
+(function initHabits(){
+  var today=todayISO();
+  // Daily reset of done-state (not streak)
+  if(S.habitsDay!==today){
+    // Before resetting, record yesterday's completion in history
+    if(S.habitsDay){
+      var done=S.habits.filter(function(h){return h.done;}).length;
+      var pct=S.habits.length?Math.round(done/S.habits.length*100):0;
+      S.habitHistory[S.habitsDay]=pct;
+    }
+    S.habits.forEach(function(h){
+      // Streak: if lastDone was yesterday → keep streak; else if >1 day gap → reset
+      if(h.done){
+        // was done; keep streak (already incremented when toggled)
+      } else {
+        // not done today -- check if more than 1 day gap
+        if(h.lastDone && diffDays(h.lastDone, today)>1){ h.streak=0; }
+      }
+      h.done=false;
+    });
+    S.habitsDay=today;
+    saveHabits();
+  }
+  document.getElementById('addHabitBtn').addEventListener('click',addHabit);
+  document.getElementById('habitInput').addEventListener('keydown',function(e){if(e.key==='Enter')addHabit();});
+  renderHabits();
+})();
+
+function addHabit(){
+  var val=document.getElementById('habitInput').value.trim();
+  if(!val)return;
+  S.habits.push({name:val,done:false,streak:0,lastDone:''});
+  document.getElementById('habitInput').value='';
+  saveHabits();renderHabits();toast('Habit added!');
+}
+function toggleHabit(i){
+  var h=S.habits[i];
+  var today=todayISO();
+  if(!h.done){
+    // Marking done
+    h.done=true;
+    // Streak: if lastDone was yesterday, continue; if never done or gap, start at 1
+    if(h.lastDone && diffDays(h.lastDone,today)===1){
+      h.streak=(h.streak||0)+1;
+    } else if(h.lastDone && diffDays(h.lastDone,today)===0){
+      // same day re-toggle -- do nothing to streak
+    } else {
+      h.streak=1;
+    }
+    h.lastDone=today;
+  } else {
+    // Unmarking done
+    h.done=false;
+    h.streak=Math.max(0,(h.streak||1)-1);
+  }
+  saveHabits();renderHabits();
+}
+function deleteHabit(i){S.habits.splice(i,1);saveHabits();renderHabits();}
+function renderHabits(){
+  var el=document.getElementById('habitList');
+  if(!S.habits.length){
+    el.innerHTML='<div class="empty" style="padding:16px 0;"><div class="empty-ico">✅</div><div class="empty-txt">Add your first habit below.</div></div>';
+  } else {
+    el.innerHTML=S.habits.map(function(h,i){
+      return '<div class="habit-row">'+
+        '<div><div class="habit-name">'+h.name+'</div>'+
+        '<div class="habit-streak">🔥 '+(h.streak||0)+' day streak</div></div>'+
+        '<div class="habit-actions">'+
+        '<button class="del-btn" data-hi="'+i+'">✕</button>'+
+        '<button class="check-btn '+(h.done?'done':'')+'" data-ti="'+i+'">'+(h.done?'✓':'')+'</button>'+
+        '</div></div>';
+    }).join('');
+    el.querySelectorAll('.del-btn[data-hi]').forEach(function(b){b.addEventListener('click',function(){deleteHabit(parseInt(this.getAttribute('data-hi')));});});
+    el.querySelectorAll('.check-btn[data-ti]').forEach(function(b){b.addEventListener('click',function(){toggleHabit(parseInt(this.getAttribute('data-ti')));});});
+  }
+  var done=S.habits.filter(function(h){return h.done;}).length;
+  var total=S.habits.length;
+  document.getElementById('progFill').style.width=(total?Math.round(done/total*100):0)+'%';
+  document.getElementById('progLabel').textContent=done+' / '+total+' done today';
+}
+
+// ══════════════════════════════════════════
+// FOOTBALL
+// ══════════════════════════════════════════
+var FB_PRESETS=['Wall Ball','Technical Session','Scanning','Passing Drills','Shooting','Dribbling','Set Pieces','Futsal','Rondos','1v1','Crossing','Finishing'];
+(function initFootball(){
+  var el=document.getElementById('fbPresets');
+  el.innerHTML=FB_PRESETS.map(function(d){return '<div class="tag" data-fb="'+d+'">'+d+'</div>';}).join('');
+  el.querySelectorAll('.tag').forEach(function(t){t.addEventListener('click',function(){toggleFbPreset(this);});});
+  document.getElementById('addFbDrillBtn').addEventListener('click',addFbDrill);
+  document.getElementById('saveFbBtn').addEventListener('click',saveFbSession);
+  renderFbDrills();renderFbSessions();
+})();
+function toggleFbPreset(el){
+  var name=el.getAttribute('data-fb');
+  if(el.classList.contains('selected')){el.classList.remove('selected');S.fbDrills=S.fbDrills.filter(function(d){return d.name!==name;});}
+  else{el.classList.add('selected');S.fbDrills.push({name:name,detail:''});}
+  renderFbDrills();
+}
+function addFbDrill(){
+  var name=document.getElementById('fbDrillName').value.trim();
+  var detail=document.getElementById('fbDrillDetail').value.trim();
+  if(!name){toast('Enter a drill name!');return;}
+  S.fbDrills.push({name:name,detail:detail});
+  document.getElementById('fbDrillName').value='';document.getElementById('fbDrillDetail').value='';
+  renderFbDrills();
+}
+function removeFbDrill(i){S.fbDrills.splice(i,1);renderFbDrills();}
+function renderFbDrills(){
+  var el=document.getElementById('fbDrillList');
+  if(!S.fbDrills.length){el.innerHTML='';return;}
+  el.innerHTML=S.fbDrills.map(function(d,i){
+    return '<div class="drill-item"><div><div class="drill-text">'+d.name+'</div>'+(d.detail?'<div class="drill-detail">'+d.detail+'</div>':'')+
+      '</div><button class="rm-btn" data-ri="'+i+'">×</button></div>';
+  }).join('');
+  el.querySelectorAll('.rm-btn[data-ri]').forEach(function(b){b.addEventListener('click',function(){removeFbDrill(parseInt(this.getAttribute('data-ri')));});});
+}
+function saveFbSession(){
+  if(!S.fbDrills.length){toast('Add at least one drill!');return;}
+  var title=document.getElementById('fbTitle').value.trim()||'Football Session';
+  var notes=document.getElementById('fbNotes').value.trim();
+  S.fbSessions.unshift({title:title,notes:notes,drills:S.fbDrills.slice(),date:new Date().toLocaleString('en-GB'),dateKey:todayISO()});
+  saveFb();S.fbDrills=[];
+  document.getElementById('fbTitle').value='';document.getElementById('fbNotes').value='';
+  document.querySelectorAll('#fbPresets .tag').forEach(function(t){t.classList.remove('selected');});
+  renderFbDrills();renderFbSessions();toast('Session saved!');
+}
+function deleteFbSession(i){S.fbSessions.splice(i,1);saveFb();renderFbSessions();}
+function renderFbSessions(){
+  var el=document.getElementById('fbSessions');
+  if(!S.fbSessions.length){el.innerHTML='<div class="empty"><div class="empty-ico">⚽</div><div class="empty-txt">No sessions yet.</div></div>';return;}
+  el.innerHTML=S.fbSessions.map(function(s,i){
+    return '<div class="s-card"><div class="s-head"><div><div class="s-title">'+s.title+'</div><div class="s-date">'+s.date+'</div></div>'+
+      '<div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-fb">⚽ FOOTBALL</span><button class="del-btn" data-fi="'+i+'">✕</button></div></div>'+
+      '<div class="chips">'+s.drills.map(function(d){return '<span class="chip">'+d.name+(d.detail?' · '+d.detail:'')+'</span>';}).join('')+'</div>'+
+      (s.notes?'<div class="s-notes">'+s.notes+'</div>':'')+
+      '</div>';
+  }).join('');
+  el.querySelectorAll('.del-btn[data-fi]').forEach(function(b){b.addEventListener('click',function(){deleteFbSession(parseInt(this.getAttribute('data-fi')));});});
+}
+
+// ══════════════════════════════════════════
+// GYM
+// ══════════════════════════════════════════
+var GYM_PRESETS=['Squats','Deadlift','Bench Press','Pull-Ups','Leg Press','Lunges','Core Circuit','Box Jumps','Hip Thrusts','Calf Raises','Plank','Rows'];
+(function initGym(){
+  var el=document.getElementById('gymPresets');
+  el.innerHTML=GYM_PRESETS.map(function(d){return '<div class="tag" data-gy="'+d+'">'+d+'</div>';}).join('');
+  el.querySelectorAll('.tag').forEach(function(t){t.addEventListener('click',function(){toggleGymPreset(this);});});
+  document.getElementById('addGymExBtn').addEventListener('click',addGymEx);
+  document.getElementById('saveGymBtn').addEventListener('click',saveGymSession);
+  renderGymEx();renderGymSessions();
+})();
+function toggleGymPreset(el){
+  var name=el.getAttribute('data-gy');
+  if(el.classList.contains('selected')){el.classList.remove('selected');S.gymExercises=S.gymExercises.filter(function(e){return e.name!==name;});}
+  else{el.classList.add('selected');S.gymExercises.push({name:name,detail:''});}
+  renderGymEx();
+}
+function addGymEx(){
+  var name=document.getElementById('gymExName').value.trim();
+  var detail=document.getElementById('gymExDetail').value.trim();
+  if(!name){toast('Enter exercise name!');return;}
+  S.gymExercises.push({name:name,detail:detail});
+  document.getElementById('gymExName').value='';document.getElementById('gymExDetail').value='';
+  renderGymEx();
+}
+function removeGymEx(i){S.gymExercises.splice(i,1);renderGymEx();}
+function renderGymEx(){
+  var el=document.getElementById('gymExList');
+  if(!S.gymExercises.length){el.innerHTML='';return;}
+  el.innerHTML=S.gymExercises.map(function(e,i){
+    return '<div class="drill-item"><div><div class="drill-text">'+e.name+'</div>'+(e.detail?'<div class="drill-detail">'+e.detail+'</div>':'')+
+      '</div><button class="rm-btn" data-gi="'+i+'">×</button></div>';
+  }).join('');
+  el.querySelectorAll('.rm-btn[data-gi]').forEach(function(b){b.addEventListener('click',function(){removeGymEx(parseInt(this.getAttribute('data-gi')));});});
+}
+function saveGymSession(){
+  if(!S.gymExercises.length){toast('Add at least one exercise!');return;}
+  var title=document.getElementById('gymTitle').value.trim()||'Gym Session';
+  var notes=document.getElementById('gymNotes').value.trim();
+  S.gymSessions.unshift({title:title,notes:notes,exercises:S.gymExercises.slice(),date:new Date().toLocaleString('en-GB'),dateKey:todayISO()});
+  saveGym();S.gymExercises=[];
+  document.getElementById('gymTitle').value='';document.getElementById('gymNotes').value='';
+  document.querySelectorAll('#gymPresets .tag').forEach(function(t){t.classList.remove('selected');});
+  renderGymEx();renderGymSessions();toast('Session saved!');
+}
+function deleteGymSession(i){S.gymSessions.splice(i,1);saveGym();renderGymSessions();}
+function renderGymSessions(){
+  var el=document.getElementById('gymSessions');
+  if(!S.gymSessions.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏋️</div><div class="empty-txt">No sessions yet.</div></div>';return;}
+  el.innerHTML=S.gymSessions.map(function(s,i){
+    return '<div class="s-card"><div class="s-head"><div><div class="s-title">'+s.title+'</div><div class="s-date">'+s.date+'</div></div>'+
+      '<div style="display:flex;gap:8px;align-items:center;"><span class="badge badge-gym">🏋️ GYM</span><button class="del-btn" data-gsi="'+i+'">✕</button></div></div>'+
+      '<div class="chips">'+s.exercises.map(function(e){return '<span class="chip">'+e.name+(e.detail?' · '+e.detail:'')+'</span>';}).join('')+'</div>'+
+      (s.notes?'<div class="s-notes">'+s.notes+'</div>':'')+
+      '</div>';
+  }).join('');
+  el.querySelectorAll('.del-btn[data-gsi]').forEach(function(b){b.addEventListener('click',function(){deleteGymSession(parseInt(this.getAttribute('data-gsi')));});});
+}
+
+// ══════════════════════════════════════════
+// CALORIES
+// ══════════════════════════════════════════
+(function initCalories(){
+  var today=todayISO();
+  if(S.caloriesDay!==today){
+    // Archive today's total before resetting
+    if(S.caloriesDay && S.foods.length){
+      var total=S.foods.reduce(function(s,f){return s+f.cal;},0);
+      S.calHistory[S.caloriesDay]=total;
+    }
+    S.foods=[];
+    S.caloriesDay=today;
+    saveFoods();
+  }
+  document.getElementById('addFoodBtn').addEventListener('click',addFood);
+  document.getElementById('foodName').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('foodCal').focus();});
+  document.getElementById('foodCal').addEventListener('keydown',function(e){if(e.key==='Enter')addFood();});
+  renderFoods();
+})();
+function addFood(){
+  var name=document.getElementById('foodName').value.trim();
+  var cal=parseInt(document.getElementById('foodCal').value);
+  if(!name||isNaN(cal)||cal<0){toast('Enter food name and calories!');return;}
+  S.foods.push({name:name,cal:cal});
+  saveFoods();
+  document.getElementById('foodName').value='';document.getElementById('foodCal').value='';
+  renderFoods();toast('Added!');
+}
+function deleteFood(i){S.foods.splice(i,1);saveFoods();renderFoods();}
+function renderFoods(){
+  var total=S.foods.reduce(function(s,f){return s+f.cal;},0);
+  document.getElementById('calTotal').textContent=total.toLocaleString();
+  var el=document.getElementById('foodList');
+  if(!S.foods.length){el.innerHTML='<div class="empty" style="padding:14px 0;"><div class="empty-ico">🍽️</div><div class="empty-txt">Nothing logged yet.</div></div>';return;}
+  el.innerHTML=S.foods.map(function(f,i){
+    return '<div class="food-item"><div class="food-name-txt">'+f.name+'</div>'+
+      '<div class="food-right"><div class="food-cal-txt">'+f.cal+' kcal</div>'+
+      '<button class="del-btn" data-fdi="'+i+'">✕</button></div></div>';
+  }).join('');
+  el.querySelectorAll('.del-btn[data-fdi]').forEach(function(b){b.addEventListener('click',function(){deleteFood(parseInt(this.getAttribute('data-fdi')));});});
+}
+
+// ══════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var DNAMES=['S','M','T','W','T','F','S'];
+document.getElementById('prevMonthBtn').addEventListener('click',function(){changeMonth(-1);});
+document.getElementById('nextMonthBtn').addEventListener('click',function(){changeMonth(1);});
+function changeMonth(d){
+  S.calM+=d;
+  if(S.calM>11){S.calM=0;S.calY++;}
+  if(S.calM<0){S.calM=11;S.calY--;}
+  renderCalendar();renderCharts();
+}
+function renderCalendar(){
+  document.getElementById('monthLbl').textContent=MONTHS[S.calM]+' '+S.calY;
+  var fbDates={};S.fbSessions.forEach(function(s){if(s.dateKey)fbDates[s.dateKey]=true;});
+  var gymDates={};S.gymSessions.forEach(function(s){if(s.dateKey)gymDates[s.dateKey]=true;});
+  var grid=document.getElementById('calGrid');
+  var html=DNAMES.map(function(d){return '<div class="cal-dl">'+d+'</div>';}).join('');
+  var firstDay=new Date(S.calY,S.calM,1).getDay();
+  var dim=new Date(S.calY,S.calM+1,0).getDate();
+  var prevDim=new Date(S.calY,S.calM,0).getDate();
+  var todKey=todayISO();
+  for(var i=firstDay-1;i>=0;i--){html+='<div class="cal-day other"><span class="day-num">'+(prevDim-i)+'</span></div>';}
+  for(var d2=1;d2<=dim;d2++){
+    var key=S.calY+'-'+pad(S.calM+1)+'-'+pad(d2);
+    var dots='';
+    if(fbDates[key])dots+='<span class="dot dot-fb"></span>';
+    if(gymDates[key])dots+='<span class="dot dot-gym"></span>';
+    html+='<div class="cal-day'+(key===todKey?' today':'')+'">'+'<span class="day-num">'+d2+'</span>'+(dots?'<div class="day-dots">'+dots+'</div>':'')+' </div>';
+  }
+  var fill=(firstDay+dim)%7===0?0:7-(firstDay+dim)%7;
+  for(var j=1;j<=fill;j++){html+='<div class="cal-day other"><span class="day-num">'+j+'</span></div>';}
+  grid.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════
+var CHART_DEFAULTS={
+  color:'rgba(255,255,255,0.6)',
+  borderColor:'rgba(255,255,255,0.08)',
+  font:{family:"'DM Mono', monospace",size:10}
+};
+Chart.defaults.color=CHART_DEFAULTS.color;
+Chart.defaults.borderColor=CHART_DEFAULTS.borderColor;
+Chart.defaults.font=CHART_DEFAULTS.font;
+
+function destroyChart(id){if(S.charts[id]){S.charts[id].destroy();delete S.charts[id];}}
+
+function renderCharts(){
+  renderSessionsBarChart();
+  renderSplitDoughnut();
+  renderWeeklyLineChart();
+  renderCalBarChart();
+  renderHabitLineChart();
+}
+
+// ── Chart 1: Sessions this month (bar: fb vs gym per week) ──
+function renderSessionsBarChart(){
+  destroyChart('sessionsBar');
+  var year=S.calY, month=S.calM;
+  var dim=new Date(year,month+1,0).getDate();
+  // Group by week of month (W1=1-7, W2=8-14, W3=15-21, W4=22-28, W5=29+)
+  var weeks=['W1','W2','W3','W4','W5'];
+  var fbW=[0,0,0,0,0],gymW=[0,0,0,0,0];
+  function weekIdx(day){return Math.min(Math.floor((day-1)/7),4);}
+  S.fbSessions.forEach(function(s){
+    if(!s.dateKey)return;
+    var p=s.dateKey.split('-');
+    if(+p[0]===year&&+p[1]-1===month){fbW[weekIdx(+p[2])]++;}
+  });
+  S.gymSessions.forEach(function(s){
+    if(!s.dateKey)return;
+    var p=s.dateKey.split('-');
+    if(+p[0]===year&&+p[1]-1===month){gymW[weekIdx(+p[2])]++;}
+  });
+  var ctx=document.getElementById('chartSessionsBar').getContext('2d');
+  S.charts['sessionsBar']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:weeks,
+      datasets:[
+        {label:'Football',data:fbW,backgroundColor:'rgba(0,230,118,0.7)',borderRadius:4,borderSkipped:false},
+        {label:'Gym',data:gymW,backgroundColor:'rgba(79,195,247,0.7)',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666',stepSize:1,precision:0},beginAtZero:true}
+      }
+    }
+  });
+}
+
+// ── Chart 2: Training split doughnut ──
+function renderSplitDoughnut(){
+  destroyChart('splitDoughnut');
+  var fbCount=S.fbSessions.length, gymCount=S.gymSessions.length, total=fbCount+gymCount;
+  document.getElementById('splitTotal').textContent=total;
+  if(!total){
+    var ctx=document.getElementById('chartSplitDoughnut').getContext('2d');
+    S.charts['splitDoughnut']=new Chart(ctx,{
+      type:'doughnut',
+      data:{labels:['No data'],datasets:[{data:[1],backgroundColor:['#222'],borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+    });
+    return;
+  }
+  var ctx=document.getElementById('chartSplitDoughnut').getContext('2d');
+  S.charts['splitDoughnut']=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Football','Gym'],
+      datasets:[{data:[fbCount,gymCount],backgroundColor:['rgba(0,230,118,0.8)','rgba(79,195,247,0.8)'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}}}
+    }
+  });
+}
+
+// ── Chart 3: Weekly sessions line (last 8 weeks) ──
+function renderWeeklyLineChart(){
+  destroyChart('weeklyLine');
+  // Build last 8 Mon–Sun weeks
+  var now=new Date();
+  var labels=[],fbData=[],gymData=[];
+  for(var w=7;w>=0;w--){
+    var weekEnd=new Date(now);weekEnd.setDate(now.getDate()-now.getDay()-w*7+6);
+    var weekStart=new Date(weekEnd);weekStart.setDate(weekEnd.getDate()-6);
+    var wsISO=weekStart.getFullYear()+'-'+pad(weekStart.getMonth()+1)+'-'+pad(weekStart.getDate());
+    var weISO=weekEnd.getFullYear()+'-'+pad(weekEnd.getMonth()+1)+'-'+pad(weekEnd.getDate());
+    labels.push(pad(weekStart.getDate())+'/'+pad(weekStart.getMonth()+1));
+    var fb=0,gym=0;
+    S.fbSessions.forEach(function(s){if(s.dateKey&&s.dateKey>=wsISO&&s.dateKey<=weISO)fb++;});
+    S.gymSessions.forEach(function(s){if(s.dateKey&&s.dateKey>=wsISO&&s.dateKey<=weISO)gym++;});
+    fbData.push(fb);gymData.push(gym);
+  }
+  var ctx=document.getElementById('chartWeeklyLine').getContext('2d');
+  S.charts['weeklyLine']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[
+        {label:'Football',data:fbData,borderColor:'rgba(0,230,118,0.9)',backgroundColor:'rgba(0,230,118,0.08)',tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'rgba(0,230,118,0.9)'},
+        {label:'Gym',data:gymData,borderColor:'rgba(79,195,247,0.9)',backgroundColor:'rgba(79,195,247,0.08)',tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'rgba(79,195,247,0.9)'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666',stepSize:1,precision:0},beginAtZero:true}
+      }
+    }
+  });
+}
+
+// ── Chart 4: Calories last 7 days ──
+function renderCalBarChart(){
+  destroyChart('calBar');
+  var labels=[],data=[];
+  var now=new Date();
+  for(var i=6;i>=0;i--){
+    var d=new Date(now);d.setDate(now.getDate()-i);
+    var key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    labels.push(pad(d.getDate())+'/'+pad(d.getMonth()+1));
+    // Today: use live foods; past days: use calHistory
+    if(key===todayISO()){
+      data.push(S.foods.reduce(function(s,f){return s+f.cal;},0));
+    } else {
+      data.push(S.calHistory[key]||0);
+    }
+  }
+  var ctx=document.getElementById('chartCalBar').getContext('2d');
+  S.charts['calBar']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:labels,
+      datasets:[{
+        label:'kcal',data:data,
+        backgroundColor:data.map(function(v){return v>2500?'rgba(255,68,68,0.7)':v>2000?'rgba(255,179,0,0.7)':'rgba(0,230,118,0.7)';}),
+        borderRadius:4,borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+// ── Chart 5: Habit completion % last 14 days ──
+function renderHabitLineChart(){
+  destroyChart('habitLine');
+  var labels=[],data=[];
+  var now=new Date();
+  for(var i=13;i>=0;i--){
+    var d=new Date(now);d.setDate(now.getDate()-i);
+    var key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    labels.push(pad(d.getDate())+'/'+pad(d.getMonth()+1));
+    if(key===todayISO()){
+      var done=S.habits.filter(function(h){return h.done;}).length;
+      data.push(S.habits.length?Math.round(done/S.habits.length*100):0);
+    } else {
+      data.push(S.habitHistory[key]!=null?S.habitHistory[key]:null);
+    }
+  }
+  var ctx=document.getElementById('chartHabitLine').getContext('2d');
+  S.charts['habitLine']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[{
+        label:'Completion %',data:data,
+        borderColor:'rgba(206,147,216,0.9)',backgroundColor:'rgba(206,147,216,0.08)',
+        tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'rgba(206,147,216,0.9)',
+        spanGaps:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#666',callback:function(v){return v+'%';}},min:0,max:100}
+      }
+    }
+  });
+}
+
+// Initial render
+renderCalendar();
+
+})();
+</script>
+</body>
+</html>
